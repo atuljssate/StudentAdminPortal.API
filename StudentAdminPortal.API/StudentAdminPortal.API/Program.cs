@@ -17,6 +17,17 @@ builder.Services.AddScoped<IStudentRepository, SqlStudentRepository>();
 builder.Services.AddDbContext<StudentAdminContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("StudentAdminPortalDb"),
 sqlServerOptions => sqlServerOptions.CommandTimeout(300)));
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("angularApplication", (builder) =>
+    {
+        builder.WithOrigins("http://localhost:4200")
+        .AllowAnyHeader()
+        .WithMethods("GET", "POST", "PUT", "DELETE")
+        .WithExposedHeaders("*");
+    });
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -27,7 +38,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseCors("angularApplication");
 app.UseAuthorization();
 
 app.MapControllers();
