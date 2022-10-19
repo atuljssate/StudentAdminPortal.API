@@ -20,11 +20,11 @@ namespace StudentAdminPortal.API.Controllers
         [Route("[controller]")]
         public async Task<IActionResult> GetAllStudentsAsync()
         {
-            var students =await studentRepository.GetStudentsAsync();        
+            var students = await studentRepository.GetStudentsAsync();
             return Ok(mapper.Map<List<Student>>(students));
         }
         [HttpGet]
-        [Route("[controller]/{studentId:guid}")]
+        [Route("[controller]/{studentId:guid}"), ActionName("GetStudentAsync")]
         public async Task<IActionResult> GetStudentAsync([FromRoute] Guid studentId)
         {
             var student = await studentRepository.GetStudentAsync(studentId);
@@ -59,11 +59,20 @@ namespace StudentAdminPortal.API.Controllers
                 //delete
                 //update
                 var student = await studentRepository.DeleteStudentAsync(studentId);
-                    return Ok(mapper.Map<Student>(student));
+                return Ok(mapper.Map<Student>(student));
             }
             return NotFound();
 
         }
 
+        [HttpPost]
+        [Route("[controller]/Add")]
+        public async Task<IActionResult> AddStudentAsync([FromBody] AddStudentRequest request)
+        {
+
+            var addStudent = await studentRepository.AddStudentAsync(mapper.Map<DataModels.Student>(request));
+            return CreatedAtAction(nameof(GetStudentAsync), new { studentId = addStudent.Id },
+                mapper.Map<Student>(addStudent));
+        }
     }
 }
