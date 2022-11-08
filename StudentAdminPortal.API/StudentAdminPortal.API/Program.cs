@@ -1,7 +1,10 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using StudentAdminPortal.API.DataModels;
 using StudentAdminPortal.API.Repositories;
+using StudentAdminPortal.API.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +33,16 @@ builder.Services.AddCors(options =>
         .WithExposedHeaders("*");
     });
 });
+
+//builder.Services.AddFluentValidation(conf =>
+//{
+//    conf.RegisterValidatorsFromAssembly(typeof(Program).Assembly);
+//    conf.AutomaticValidationEnabled = false;
+//});
+
+builder.Services.AddFluentValidationAutoValidation(fv => { });
+builder.Services.AddValidatorsFromAssemblyContaining<AddStudentRequestValidator>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -45,7 +58,6 @@ app.UseStaticFiles(new StaticFileOptions
     FileProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, "Resources")),
     RequestPath = "/Resources"
 });
-
 app.UseCors("angularApplication");
 app.UseAuthorization();
 
